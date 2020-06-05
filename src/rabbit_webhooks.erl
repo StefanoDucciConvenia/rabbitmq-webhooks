@@ -66,7 +66,12 @@ init([Config]) ->
       [{queue, Qname} | Qconfig] -> #'queue.declare'{ 
           queue=Qname, 
           auto_delete=proplists:get_value(auto_delete, Qconfig, true), 
-          durable=proplists:get_value(durable, Qconfig, false)
+          durable=proplists:get_value(durable, Qconfig, false),
+					arguments={
+						'x-dead-letter-exchange' = get_value(x-dead-letter-exchange, Qconfig, <<"amq.topic">>),
+						'x-dead-letter-routing-key' = get_value(x-dead-letter-routing-key, Qconfig, <<"dead">>),
+						'x-queue-type' = get_value(x-queue-type, Qconfig, <<"classic">>)
+					}
         };
       % Default to an anonymous queue
       _ -> #'queue.declare'{ auto_delete=true }
